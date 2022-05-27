@@ -8,7 +8,7 @@
  * When running `npm run build` or `npm run build:main`, this file is compiled to
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
-import { app, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, BrowserWindow, globalShortcut, ipcMain, shell } from 'electron';
 import log from 'electron-log';
 import { autoUpdater } from 'electron-updater';
 import mainWindwConfig from './mainWindowConfig';
@@ -25,10 +25,58 @@ export default class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+ipcMain.on('search-request', async (event, [arg, ...args]) => {
+  console.log('ipcMain search-request', arg);
+
+  const mockData = [
+    {
+      name: 'test1',
+    },
+    {
+      name: 'test2',
+    },
+    {
+      name: 'test3',
+    },
+    {
+      name: 'test4',
+    },
+    {
+      name: 'test5',
+    },
+  ];
+
+  const data = mockData.filter((item) => item.name.includes(arg));
+  const maxLength = 5;
+  const heightPerItem = 45;
+  if (data.length > maxLength) {
+    // max nr of items shown
+    mainWindow?.setSize(
+      mainWindwConfig.width,
+      mainWindwConfig.height + heightPerItem * maxLength
+    );
+  } else {
+    // lower nr of items
+    mainWindow?.setSize(
+      mainWindwConfig.width,
+      mainWindwConfig.height + heightPerItem * data.length
+    );
+  }
+
+  event.reply('search-reply', data);
+});
+
+// to be used in the future if i want to reset other things
+ipcMain.on('search-reset', (event, [arg]) => {
+  if (arg) {
+    switch (arg) {
+      case 'size':
+        mainWindow?.setSize(mainWindwConfig.width, mainWindwConfig.height);
+        break;
+      default:
+        break;
+    }
+  }
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -74,6 +122,35 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+  });
+
+  // On focus create global shortcuts
+  mainWindow.on('focus', function () {
+    mainWindow?.webContents.send('focus-input');
+    // Show and hide the window
+    globalShortcut.register('CommandOrControl+Alt+F', () => {
+      if (mainWindow?.isFocused()) {
+        mainWindow.hide();
+      } else {
+        mainWindow?.show();
+      }
+    });
+
+    globalShortcut.register('Escape', function () {
+      mainWindow?.hide();
+    });
+
+    globalShortcut.register('F12', () => {
+      if (mainWindow?.isFocused()) {
+        mainWindow.toggleDevTools();
+      }
+    });
+  });
+
+  mainWindow.on('blur', function () {
+    mainWindow?.hide();
+    globalShortcut.unregister('Escape');
+    globalShortcut.unregister('F12');
   });
 
   mainWindow.on('closed', () => {

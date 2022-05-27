@@ -163,7 +163,7 @@ input#searchBox::-webkit-search-cancel-button {
 }
 
 #results li {
-  background-color: blue;
+  background-color: transparent;
   display: flex;
   position: relative;
   color: rgba(255, 255, 255, 0.5);
