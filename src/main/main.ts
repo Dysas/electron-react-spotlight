@@ -23,6 +23,8 @@ export default class AppUpdater {
   }
 }
 
+if (process.platform === 'darwin') app.dock.hide();
+
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('search-request', async (event, [arg, ...args]) => {
