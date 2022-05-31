@@ -1,5 +1,8 @@
 import { debounce } from 'hooks/useDebounce';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import Results from './Results';
+import SearchInput from './SearchInput';
+import Tabs from './Tabs';
 
 const { ipcRenderer } = window.electron;
 
@@ -31,25 +34,9 @@ const Search = () => {
 
   return (
     <>
-      <div className="runner-input">
-        <ul id="tabs">
-          <li id="run" className="active">
-            search
-          </li>
-        </ul>
-        <input
-          id="searchBox"
-          ref={inputRef}
-          onChange={handleChange}
-          type="search"
-          placeholder="Search for..."
-        />
-      </div>
-      <ul id="results">
-        {results?.map((item) => (
-          <li key={item.name}>{item.name}</li>
-        ))}
-      </ul>
+      <Tabs />
+      <SearchInput ref={inputRef} onChange={handleChange} />
+      <Results results={results} />
     </>
   );
 };
