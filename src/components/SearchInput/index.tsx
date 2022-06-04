@@ -1,23 +1,25 @@
 import React, { forwardRef } from 'react';
-import { StyledSearchInput } from './SearchInput.styles';
+import { GrSearch } from 'react-icons/gr';
+import { SearchContainer, StyledSearchInput } from './SearchInput.styles';
 
 type SearchInputProps = {
-  className?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  ref?: React.Ref<HTMLInputElement>;
 };
 
-const SearchInput: React.FC<SearchInputProps> = forwardRef(
-  ({ onChange, className }, ref) => {
+const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
+  ({ onChange }: SearchInputProps, ref) => {
     return (
-      <StyledSearchInput
-        className={className}
-        id="searchBox"
-        ref={ref}
-        onChange={onChange}
-        type="search"
-        placeholder="Search for..."
-      />
+      <SearchContainer>
+        <GrSearch />
+        <StyledSearchInput
+          id="searchBox"
+          ref={ref}
+          onChange={onChange}
+          type="search"
+          placeholder="Search for..."
+          onBlur={(e) => e.currentTarget.focus()}
+        />
+      </SearchContainer>
     );
   }
 );

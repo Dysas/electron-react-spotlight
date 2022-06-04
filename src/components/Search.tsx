@@ -1,13 +1,13 @@
 import { debounce } from 'hooks/useDebounce';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { SearchItemType } from 'renderer/types';
 import Results from './Results';
 import SearchInput from './SearchInput';
-import Tabs from './Tabs';
 
 const { ipcRenderer } = window.electron;
 
 const Search = () => {
-  const [results, setResults] = useState<Array<{ name: string }>>([]);
+  const [results, setResults] = useState<SearchItemType>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -24,17 +24,16 @@ const Search = () => {
 
   useEffect(() => {
     ipcRenderer.on('search-reply', (data) => {
-      setResults(data);
+      setResults(data as SearchItemType);
     });
 
-    ipcRenderer.on('focus-input', (data) => {
+    ipcRenderer.on('focus-input', () => {
       inputRef.current?.focus();
     });
   }, []);
 
   return (
     <>
-      <Tabs />
       <SearchInput ref={inputRef} onChange={handleChange} />
       <Results results={results} />
     </>

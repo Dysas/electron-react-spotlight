@@ -27,12 +27,13 @@ if (process.platform === 'darwin') app.dock.hide();
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('search-request', async (event, [arg, ...args]) => {
+ipcMain.on('search-request', async (event, [arg]) => {
   console.log('ipcMain search-request', arg);
 
   const mockData = [
     {
-      name: 'test1',
+      name: 'google',
+      url: 'https://www.google.com',
     },
     {
       name: 'test2',
@@ -69,7 +70,7 @@ ipcMain.on('search-request', async (event, [arg, ...args]) => {
 });
 
 // to be used in the future if i want to reset other things
-ipcMain.on('search-reset', (event, [arg]) => {
+ipcMain.on('search-reset', (_event, [arg]) => {
   if (arg) {
     switch (arg) {
       case 'size':
@@ -127,7 +128,7 @@ const createWindow = async () => {
   });
 
   // On focus create global shortcuts
-  mainWindow.on('focus', function () {
+  mainWindow.on('focus', () => {
     mainWindow?.webContents.send('focus-input');
     // Show and hide the window
     globalShortcut.register('CommandOrControl+Alt+F', () => {
@@ -138,18 +139,18 @@ const createWindow = async () => {
       }
     });
 
-    globalShortcut.register('Escape', function () {
+    globalShortcut.register('Escape', () => {
       mainWindow?.hide();
     });
 
     globalShortcut.register('F12', () => {
       if (mainWindow?.isFocused()) {
-        mainWindow.toggleDevTools();
+        mainWindow.webContents.toggleDevTools();
       }
     });
   });
 
-  mainWindow.on('blur', function () {
+  mainWindow.on('blur', () => {
     mainWindow?.hide();
     globalShortcut.unregister('Escape');
     globalShortcut.unregister('F12');

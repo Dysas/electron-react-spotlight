@@ -1,16 +1,18 @@
 import React from 'react';
+import { SearchItemType } from 'renderer/types';
 import { ResultsList, ResultsListItem } from './Results.styles';
 
 type ResultsProps = {
-  className?: string;
-  results: Array<{ name: string }>;
+  results: SearchItemType;
 };
 
-const Results: React.FC<ResultsProps> = ({ results, className }) => {
+const Results: React.FC<ResultsProps> = ({ results }) => {
   return (
-    <ResultsList id="results" className={className}>
+    <ResultsList id="results">
       {results?.map((item) => (
-        <ResultsListItem key={item.name}>{item.name}</ResultsListItem>
+        <ResultsListItem key={item.name}>
+          <a href={item.url}>{item.name}</a>
+        </ResultsListItem>
       ))}
     </ResultsList>
   );
